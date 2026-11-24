@@ -6,9 +6,12 @@
 
 | Где | Как |
 | --- | --- |
-| Браузер / телефон | обычный сайт (PWA, работает офлайн) |
-| Windows | `ChessReview.exe` — самодостаточный файл, WebView2 |
-| Android | `ChessReview.apk` — WebView + локальный HTTP-сервер |
+| Браузер / телефон | [открыть сайт](https://zuza52.github.io/chess-review/) (PWA, работает офлайн) |
+| Windows | [`ChessReview.exe`](https://github.com/zuza52/chess-review/releases/latest/download/ChessReview.exe) — самодостаточный файл, WebView2 |
+| Android | [`ChessReview-android.apk`](https://github.com/zuza52/chess-review/releases/latest/download/ChessReview-android.apk) — WebView + локальный HTTP-сервер |
+
+APK: Android 7.0+, ~1.4 МБ, подписан debug-ключом (для установки вручную этого достаточно).
+EXE: Windows 10/11 x64, ~65 МБ, .NET внутри; нужен только WebView2 Runtime, который в Windows уже есть.
 
 ![Скриншот](docs/screenshot-desktop.png)
 
