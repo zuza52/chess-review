@@ -1,5 +1,5 @@
 /* Chess Review — офлайн-кэш приложения */
-const VERSION = 'cr-v2';
+const VERSION = 'cr-v3';
 
 const ASSETS = [
   './',

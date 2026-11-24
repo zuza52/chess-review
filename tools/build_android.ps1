@@ -70,9 +70,14 @@ Write-Host "==> javac" -ForegroundColor Cyan
 $javaFiles = @()
 $javaFiles += Get-ChildItem (Join-Path $android 'src') -Recurse -Filter *.java | ForEach-Object { $_.FullName }
 $javaFiles += Get-ChildItem $gen -Recurse -Filter *.java | ForEach-Object { $_.FullName }
-& (Join-Path $jdk.FullName 'bin\javac.exe') -encoding UTF-8 -source 8 -target 8 -Xlint:-options `
-    -bootclasspath $androidJar -classpath $androidJar -d $classes @javaFiles 2>&1 | Out-String | Write-Host
-if ($LASTEXITCODE -ne 0) { throw "javac failed" }
+# javac пишет заметки в stderr, а при ErrorActionPreference=Stop это ломает скрипт
+$prevEap = $ErrorActionPreference
+$ErrorActionPreference = 'Continue'
+& (Join-Path $jdk.FullName 'bin\javac.exe') -encoding UTF-8 -source 8 -target 8 -nowarn -Xlint:-options `
+    -bootclasspath $androidJar -classpath $androidJar -d $classes @javaFiles 2>&1 | ForEach-Object { Write-Host $_ }
+$javacExit = $LASTEXITCODE
+$ErrorActionPreference = $prevEap
+if ($javacExit -ne 0) { throw "javac failed" }
 
 Write-Host "==> d8" -ForegroundColor Cyan
 $classFiles = @(Get-ChildItem $classes -Recurse -Filter *.class | ForEach-Object { $_.FullName })

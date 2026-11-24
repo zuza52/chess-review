@@ -1070,6 +1070,19 @@ function registerSW() {
 }
 
 // ------------------------------------------------------------------ boot
+// Аппаратная кнопка «назад» (Android): закрываем окно, если оно открыто.
+window.__crBack = function () {
+  const root = document.getElementById('modalRoot');
+  if (root && root.firstElementChild) {
+    const closeBtn = root.querySelector('.modal-close');
+    if (closeBtn) closeBtn.click();
+    else root.innerHTML = '';
+    return true;
+  }
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  return false;
+};
+
 function boot() {
   setupBoards();
   setupChart();
