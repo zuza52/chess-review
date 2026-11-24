@@ -1,0 +1,28 @@
+# --- build output -----------------------------------------------------------
+android/build/
+android/assets/
+desktop/web/
+desktop/web.zip
+desktop/bin/
+desktop/obj/
+desktop/publish/
+dist/
+*.apk
+*.aab
+*.idsig
+
+# --- python -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+
+# --- editors / os -----------------------------------------------------------
+.vs/
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+*.user
+
+# --- local keys -------------------------------------------------------------
+*.keystore
+*.jks

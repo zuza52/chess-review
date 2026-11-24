@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Chess Review — разбор партий</title>
+<meta name="description" content="Бесплатный разбор шахматных партий как на chess.com: Stockfish 19 работает прямо на телефоне, офлайн.">
+<meta name="theme-color" content="#262421">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Chess Review">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="stylesheet" href="css/pieces.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <img class="logo" src="assets/icon-192.png" alt="">
+      <div class="brand-text">
+        <div class="brand-name">Chess Review</div>
+        <div class="brand-sub" id="engineChip"><span class="dot"></span> Stockfish 19 · загрузка…</div>
+      </div>
+    </div>
+    <nav class="topbar-tabs" aria-label="Разделы">
+      <button class="ttab active" data-screen="review">Разбор</button>
+      <button class="ttab" data-screen="board">Доска</button>
+    </nav>
+
+    <div class="topbar-actions">
+      <button class="icon-btn" id="btnNewGame" title="Загрузить другую партию" aria-label="Загрузить другую партию">＋</button>
+      <button class="icon-btn" id="btnSettings" title="Настройки" aria-label="Настройки">⚙</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ======================= REVIEW ======================= -->
+    <section class="screen" id="screen-review">
+      <div class="review-grid">
+
+        <div class="board-col">
+          <div class="players" id="playersBar">
+            <div class="player white">
+              <span class="pc-dot light"></span>
+              <span class="pname">Белые</span>
+            </div>
+            <div class="result" id="gameResult">—</div>
+            <div class="player black">
+              <span class="pc-dot dark"></span>
+              <span class="pname">Чёрные</span>
+            </div>
+          </div>
+
+          <div class="board-area">
+            <div class="evalbar" id="evalBar">
+              <div class="evalbar-white" id="evalBarFill"></div>
+              <div class="evalbar-txt" id="evalBarTxt">0.0</div>
+            </div>
+            <div class="board-host">
+              <div class="board" id="board" aria-label="Шахматная доска"></div>
+            </div>
+          </div>
+
+          <div class="nav-row">
+            <button class="nav-btn" data-nav="start" aria-label="В начало">⏮</button>
+            <button class="nav-btn" data-nav="prev" aria-label="Назад">◀</button>
+            <button class="nav-btn" data-nav="next" aria-label="Вперёд">▶</button>
+            <button class="nav-btn" data-nav="end" aria-label="В конец">⏭</button>
+            <span class="spacer"></span>
+            <button class="nav-btn" data-nav="flip" aria-label="Перевернуть доску">⇅</button>
+          </div>
+
+          <div class="move-card" id="moveCard">
+            <div class="mc-empty">Загрузите партию, чтобы увидеть разбор.</div>
+          </div>
+        </div>
+
+        <div class="panel-col">
+          <div class="card import-card" id="importCard">
+            <h2>Разбор партии</h2>
+            <p class="muted">Вставьте PGN, откройте файл или посмотрите пример. Счёт идёт на вашем устройстве — бесплатно, без аккаунта и без интернета.</p>
+            <textarea id="pgnInput" spellcheck="false" placeholder="[Event &quot;Моя партия&quot;]&#10;1. e4 e5 2. Nf3 Nc6 3. Bb5 ..."></textarea>
+            <div class="row wrap">
+              <button class="btn primary" id="btnLoadPgn">Загрузить PGN</button>
+              <button class="btn" id="btnPickFile">Файл .pgn</button>
+              <button class="btn ghost" id="btnSample">Пример</button>
+            </div>
+            <input type="file" id="fileInput" accept=".pgn,.txt,text/plain" hidden>
+          </div>
+
+          <div class="card review-card hidden" id="reviewCard">
+            <div class="review-head">
+              <div class="acc-badge" id="accWhite">
+                <span class="acc-num">—</span>
+                <span class="acc-lbl">белые</span>
+              </div>
+              <div class="review-mid">
+                <div class="review-title" id="openingName">Разбор</div>
+                <div class="muted small" id="analysisMeta">не проанализировано</div>
+              </div>
+              <div class="acc-badge dark" id="accBlack">
+                <span class="acc-num">—</span>
+                <span class="acc-lbl">чёрные</span>
+              </div>
+            </div>
+
+            <div class="chart-wrap" id="chartWrap">
+              <canvas id="chart"></canvas>
+              <div class="chart-hint muted small">нажмите на график, чтобы перейти к ходу</div>
+            </div>
+
+            <div class="movelist" id="moveList"></div>
+
+            <div class="analysis-bar" id="analysisBar">
+              <button class="btn primary wide" id="btnAnalyze">Анализировать</button>
+              <div class="progress hidden" id="progress">
+                <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+                <div class="progress-text" id="progressText">0%</div>
+                <button class="btn small ghost" id="btnCancel">Отмена</button>
+              </div>
+            </div>
+
+            <div class="counts" id="countsRow"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= BOARD ======================= -->
+    <section class="screen hidden" id="screen-board">
+      <div class="review-grid">
+        <div class="board-col">
+          <div class="players">
+            <div class="player white"><span class="pc-dot light"></span><span class="pname">Белые</span></div>
+            <div class="result" id="freeTurn">ход белых</div>
+            <div class="player black"><span class="pc-dot dark"></span><span class="pname">Чёрные</span></div>
+          </div>
+
+          <div class="board-area">
+            <div class="evalbar" id="freeEvalBar">
+              <div class="evalbar-white" id="freeEvalFill"></div>
+              <div class="evalbar-txt" id="freeEvalTxt">0.0</div>
+            </div>
+            <div class="board-host">
+              <div class="board" id="freeBoard" aria-label="Доска для анализа"></div>
+            </div>
+          </div>
+
+          <div class="nav-row">
+            <button class="nav-btn" id="freeUndo" aria-label="Отменить ход">↶</button>
+            <button class="nav-btn" id="freeReset" aria-label="Начальная позиция">⟲</button>
+            <span class="spacer"></span>
+            <button class="nav-btn" id="freeCopyFen" aria-label="Скопировать FEN">FEN</button>
+            <button class="nav-btn" id="freeFlip" aria-label="Перевернуть доску">⇅</button>
+          </div>
+        </div>
+
+        <div class="panel-col">
+          <div class="card">
+            <div class="card-head">
+              <h2>Анализ позиции</h2>
+              <label class="switch">
+                <input type="checkbox" id="freeEngineOn" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="engine-lines" id="freeLines">
+              <div class="muted small">Сделайте ход — движок начнёт считать.</div>
+            </div>
+            <div class="muted small engine-stat" id="freeStat"></div>
+          </div>
+
+          <div class="card">
+            <h2>Позиция</h2>
+            <div class="row">
+              <input class="text-input" id="fenInput" placeholder="Вставьте FEN" spellcheck="false">
+              <button class="btn" id="btnLoadFen">ОК</button>
+            </div>
+            <div class="muted small" id="fenCurrent" style="word-break:break-all;margin-top:8px"></div>
+          </div>
+
+          <div class="card">
+            <h2>Ходы</h2>
+            <div class="movelist compact" id="freeMoveList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabbar">
+    <button class="tab active" data-screen="review">
+      <span class="tab-ico">📊</span><span>Разбор</span>
+    </button>
+    <button class="tab" data-screen="board">
+      <span class="tab-ico">♟</span><span>Доска</span>
+    </button>
+  </nav>
+</div>
+
+<div id="toast" class="toast"></div>
+<div id="modalRoot"></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
